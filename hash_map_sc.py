@@ -58,22 +58,36 @@ class HashMap:
         buckets = self._buckets
         hash = self._hash_function(key)
         index = hash % buckets.length()
-        length = buckets.length()
-        something = hash + 1
-
+        linked_hash = buckets.get_at_index(index)
+        contains = linked_hash.contains(key)
+        if contains is not None:
+            contains.key = key
+            contains.value = value
+        else:
+            linked_hash.insert(key, value)
+            self._size += 1
 
 
     def empty_buckets(self) -> int:
+        """ A method that returns the number of empty buckets in the hash table.
         """
-        TODO: Write this implementation
-        """
-        pass
+        hash_table = self._buckets
+        empty_buckets = 0
+        for index in range(0, hash_table.length()):
+            if hash_table.get_at_index(index).length() == 0:
+                empty_buckets += 1
+
+        return empty_buckets
 
     def table_load(self) -> float:
+        """ A method that returns the current hash table load factor.
         """
-        TODO: Write this implementation
-        """
-        pass
+        hash_table = self._buckets
+        table_load = self._size / self._capacity
+        return table_load
+
+
+
 
     def clear(self) -> None:
         """
