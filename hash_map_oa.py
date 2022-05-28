@@ -22,6 +22,8 @@ class HashMap:
             self._buckets.append(None)
 
         self._capacity = capacity
+
+
         self._hash_function = function
         self._size = 0
 
