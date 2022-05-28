@@ -3,7 +3,7 @@
 # Course: CS261 - Data Structures
 # Assignment: 6
 # Due Date: 6/3/22
-# Description:
+# Description:A HashMap that uses open addressing with quadratic probing for collision resolution.
 
 
 from a6_include import (DynamicArray, HashEntry,

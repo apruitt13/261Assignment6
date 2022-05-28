@@ -3,7 +3,7 @@
 # Course: CS261 - Data Structures
 # Assignment: 6
 # Due Date: 6/3/22
-# Description:
+# Description: A hashmap that uses chaining for collision resolution. It uses a single linked list.
 
 
 from a6_include import (DynamicArray, LinkedList,
@@ -52,10 +52,16 @@ class HashMap:
     # ------------------------------------------------------------------ #
 
     def put(self, key: str, value: object) -> None:
+        """ A method that updates the key/value pair in the hash map. If it exists it is replaced with a new value.
+        If it's not in the map than it should be added.
         """
-        TODO: Write this implementation
-        """
-        pass
+        buckets = self._buckets
+        hash = self._hash_function(key)
+        index = hash % buckets.length()
+        length = buckets.length()
+        something = hash + 1
+
+
 
     def empty_buckets(self) -> int:
         """
