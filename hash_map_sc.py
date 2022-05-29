@@ -206,12 +206,19 @@ def find_mode(da: DynamicArray) -> (DynamicArray, int):
     # if you'd like to use a hash map,
     # use this instance of your Separate Chaining HashMap
     map = HashMap(da.length() // 3, hash_function_1)
+    stored_count = 0
+    mode_array = DynamicArray()
 
     for index in range(0, da.length()):
-        map.alt_put(da.get_at_index(index), da.get_at_index(index))
+        if map.contains_key(da.get_at_index(index)) is False:
+            count = 1
+            map.put(da.get_at_index(index), count)
 
-        # Apple only appears once because put will replace duplicates basically.
-    test = map.get_size()
+
+        else:
+            count = map.get(da.get_at_index(index))
+            map.put(da.get_at_index(index), count + 1)
+
 
 
 
