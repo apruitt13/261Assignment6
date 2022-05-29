@@ -202,9 +202,6 @@ def find_mode(da: DynamicArray) -> (DynamicArray, int):
     """ A function that will return a tuple containing the value/s that appear with the highest frequency and the
     frequency at which they occur.
     """
-
-    # if you'd like to use a hash map,
-    # use this instance of your Separate Chaining HashMap
     map = HashMap(da.length() // 3, hash_function_1)
     stored_count = 0
     mode_array = DynamicArray()
@@ -213,13 +210,24 @@ def find_mode(da: DynamicArray) -> (DynamicArray, int):
         if map.contains_key(da.get_at_index(index)) is False:
             count = 1
             map.put(da.get_at_index(index), count)
-
-
+            if count == stored_count:
+                mode_array.append(da.get_at_index(index))
+            elif count > stored_count:
+                mode_array = DynamicArray()
+                mode_array.append(da.get_at_index(index))
+                stored_count = count
         else:
             count = map.get(da.get_at_index(index))
             map.put(da.get_at_index(index), count + 1)
+            count += 1
+            if count == stored_count:
+                mode_array.append(da.get_at_index(index))
+            elif count > stored_count:
+                mode_array = DynamicArray()
+                mode_array.append(da.get_at_index(index))
+                stored_count = count
 
-
+    return mode_array, stored_count
 
 
 # ------------------- BASIC TESTING ---------------------------------------- #
