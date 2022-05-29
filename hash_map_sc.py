@@ -55,8 +55,8 @@ class HashMap:
         """ A method that updates the key/value pair in the hash map. If it exists it is replaced with a new value.
         If it's not in the map than it should be added.
         """
-        if self.table_load() > 10:
-            self.resize_table(self._size * 2)
+        '''if self.table_load() > 10:
+            self.resize_table(self._size * 2)'''
         buckets = self._buckets
         hash = self._hash_function(key)
         index = hash % buckets.length()
@@ -77,7 +77,6 @@ class HashMap:
         for index in range(0, hash_table.length()):
             if hash_table.get_at_index(index).length() == 0:
                 empty_buckets += 1
-
         return empty_buckets
 
     def table_load(self) -> float:
@@ -100,7 +99,36 @@ class HashMap:
     def resize_table(self, new_capacity: int) -> None:
         """ A method that changes the capacity of the internal hash table.
         """
+        buckets = self._buckets
+        new_hash = DynamicArray()
+        keys = self.get_keys()
+        if new_capacity < 1:
+            return
+        for index in range(0, new_capacity):
+            link = LinkedList()
+            new_hash.append(link)
 
+        for index in range(0, buckets.length()):
+            count = buckets.get_at_index(index).length()
+            bucket = buckets.get_at_index(index)
+            if count != 0:
+                head = iter(bucket)
+                node = next(head)
+            while count != 0:
+                key = node.key
+                value = node.value
+                hash = self._hash_function(key)
+                new_index = hash % new_hash.length()
+                linked_hash = new_hash.get_at_index(new_index)
+                linked_hash.insert(key, value)
+                node = node.next
+                count -= 1
+                #new_hash.set_at_index(new_index, node)
+
+        self._buckets = new_hash
+        self._capacity = new_capacity
+        length = self._size
+        something = length + 1
 
     def get(self, key: str) -> object:
         """ A method that returns the value associated with a given key.
@@ -149,25 +177,30 @@ class HashMap:
             return
         else:
             link.remove(key)
+            self._size -= 1
 
     def get_keys(self) -> DynamicArray:
         """ A method that returns a DynamicArray of all the keys in the hash.
         """
         hash_table = self._buckets
         array = DynamicArray()
-        hash_table.
+
         for index in range(0, hash_table.length()):
-            if hash_table.get_at_index(index).length() > 1:
-                node = hash_table.get_at_index(index)
-
-                while node.next is not None:
-                    array.append(node)
+            if hash_table.get_at_index(index).length() > 0:
+                bucket = hash_table.get_at_index(index)
+                length = bucket.length()
+                head = iter(bucket)
+                node = next(head)
+                while length != 0:
+                    key = node.key
+                    array.append(key)
                     node = node.next
+                    length -= 1
 
-            elif hash_table.get_at_index(index).length() == 1:
+            '''elif hash_table.get_at_index(index).length() == 1:
                 node = hash_table.get_at_index(index)
-                array.append(node)
-
+                array.append(node.value)'''
+        return array
 
 def find_mode(da: DynamicArray) -> (DynamicArray, int):
     """
@@ -257,6 +290,7 @@ if __name__ == "__main__":
     print(m.get_size(), m.get_capacity())
     m.put('key2', 20)
     print(m.get_size(), m.get_capacity())
+
     m.resize_table(100)
     print(m.get_size(), m.get_capacity())
     m.clear()
@@ -282,6 +316,7 @@ if __name__ == "__main__":
         m.resize_table(capacity)
 
         m.put('some key', 'some value')
+        size = m.get_size()
         result = m.contains_key('some key')
         m.remove('some key')
 
@@ -290,6 +325,7 @@ if __name__ == "__main__":
             result &= m.contains_key(str(key))
             # NOT inserted keys must be absent
             result &= not m.contains_key(str(key + 1))
+            size = m.get_size()
         print(capacity, result, m.get_size(), m.get_capacity(), round(m.table_load(), 2))
 
     print("\nPDF - get example 1")
