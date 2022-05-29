@@ -54,59 +54,65 @@ class HashMap:
     # ------------------------------------------------------------------ #
 
     def put(self, key: str, value: object) -> None:
-        """
-        TODO: Write this implementation
+        """ A method that updates the key/value pair in the hash map.
         """
         # remember, if the load factor is greater than or equal to 0.5,
         # resize the table before putting the new key/value pair
-        pass
+        buckets = self._buckets
+        hash = self._hash_function(key)
+        index = hash % buckets.length()
+        entry = buckets.get_at_index(index)
+        if self.table_load() >= 0.5:
+            self.resize_table(self._capacity * 2)
+
+        if entry
+
 
     def table_load(self) -> float:
+        """ A method that returns the current hash table load factor.
         """
-        TODO: Write this implementation
-        """
-        pass
+        table_load = self._size / self._capacity
+        return table_load
 
     def empty_buckets(self) -> int:
+        """ A method that returns the number of empty buckets in the hash table.
         """
-        TODO: Write this implementation
-        """
-        pass
+        buckets = self._buckets
+        count = 0
+        for index in range(0, self._size):
+            value = buckets.get_at_index(index)
+            inside_value = 1 + 1
+            #if buckets.get_at_index(index) is None:
+                #count += 1
 
     def resize_table(self, new_capacity: int) -> None:
-        """
-        TODO: Write this implementation
+        """ A method that changes the capacity of the internal hash table.
         """
         # remember to rehash non-deleted entries into new table
         pass
 
     def get(self, key: str) -> object:
-        """
-        TODO: Write this implementation
+        """ A method that returns the value associated with the given key.
         """
         pass
 
     def contains_key(self, key: str) -> bool:
-        """
-        TODO: Write this implementation
+        """A method that searches for a given key in the hash map.
         """
         pass
 
     def remove(self, key: str) -> None:
-        """
-        TODO: Write this implementation
+        """ The method removes the given key and it's value from the hash map.
         """
         pass
 
     def clear(self) -> None:
-        """
-        TODO: Write this implementation
+        """ A method that clears the contents of the hash map.
         """
         pass
 
     def get_keys(self) -> DynamicArray:
-        """
-        TODO: Write this implementation
+        """ A method that returns a DynamicArray that contains all the keys stored in the hash map.
         """
         pass
 

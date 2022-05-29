@@ -55,8 +55,7 @@ class HashMap:
         """ A method that updates the key/value pair in the hash map. If it exists it is replaced with a new value.
         If it's not in the map than it should be added.
         """
-        '''if self.table_load() > 10:
-            self.resize_table(self._size * 2)'''
+
         buckets = self._buckets
         hash = self._hash_function(key)
         index = hash % buckets.length()
@@ -68,6 +67,18 @@ class HashMap:
         else:
             linked_hash.insert(key, value)
             self._size += 1
+
+    def alt_put(self, key: str, value: object) -> None:
+        """ A method that updates the key/value pair in the hash map. If it exists it is replaced with a new value.
+        If it's not in the map than it should be added.
+        """
+        buckets = self._buckets
+        hash = self._hash_function(key)
+        index = hash % buckets.length()
+        linked_hash = buckets.get_at_index(index)
+        node = linked_hash.contains(key)
+        linked_hash.insert(key, value)
+        self._size += 1
 
     def empty_buckets(self) -> int:
         """ A method that returns the number of empty buckets in the hash table.
@@ -101,7 +112,6 @@ class HashMap:
         """
         buckets = self._buckets
         new_hash = DynamicArray()
-        keys = self.get_keys()
         if new_capacity < 1:
             return
         for index in range(0, new_capacity):
@@ -112,23 +122,17 @@ class HashMap:
             count = buckets.get_at_index(index).length()
             bucket = buckets.get_at_index(index)
             if count != 0:
-                head = iter(bucket)
-                node = next(head)
-            while count != 0:
-                key = node.key
-                value = node.value
-                hash = self._hash_function(key)
-                new_index = hash % new_hash.length()
-                linked_hash = new_hash.get_at_index(new_index)
-                linked_hash.insert(key, value)
-                node = node.next
-                count -= 1
-                #new_hash.set_at_index(new_index, node)
+                for node in bucket:
+                    key = node.key
+                    value = node.value
+                    hash = self._hash_function(key)
+                    new_index = hash % new_hash.length()
+                    linked_hash = new_hash.get_at_index(new_index)
+                    linked_hash.insert(key, value)
+                    count -= 1
 
         self._buckets = new_hash
         self._capacity = new_capacity
-        length = self._size
-        something = length + 1
 
     def get(self, key: str) -> object:
         """ A method that returns the value associated with a given key.
@@ -189,26 +193,26 @@ class HashMap:
             if hash_table.get_at_index(index).length() > 0:
                 bucket = hash_table.get_at_index(index)
                 length = bucket.length()
-                head = iter(bucket)
-                node = next(head)
-                while length != 0:
-                    key = node.key
-                    array.append(key)
-                    node = node.next
+                for node in bucket:
+                    array.append(node.key)
                     length -= 1
-
-            '''elif hash_table.get_at_index(index).length() == 1:
-                node = hash_table.get_at_index(index)
-                array.append(node.value)'''
         return array
 
 def find_mode(da: DynamicArray) -> (DynamicArray, int):
+    """ A function that will return a tuple containing the value/s that appear with the highest frequency and the
+    frequency at which they occur.
     """
-    TODO: Write this implementation
-    """
+
     # if you'd like to use a hash map,
     # use this instance of your Separate Chaining HashMap
     map = HashMap(da.length() // 3, hash_function_1)
+
+    for index in range(0, da.length()):
+        map.alt_put(da.get_at_index(index), da.get_at_index(index))
+
+        # Apple only appears once because put will replace duplicates basically.
+    test = map.get_size()
+
 
 
 # ------------------- BASIC TESTING ---------------------------------------- #
