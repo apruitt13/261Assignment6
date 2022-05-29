@@ -55,18 +55,19 @@ class HashMap:
         """ A method that updates the key/value pair in the hash map. If it exists it is replaced with a new value.
         If it's not in the map than it should be added.
         """
+        if self.table_load() > 10:
+            self.resize_table(self._size * 2)
         buckets = self._buckets
         hash = self._hash_function(key)
         index = hash % buckets.length()
         linked_hash = buckets.get_at_index(index)
-        contains = linked_hash.contains(key)
-        if contains is not None:
-            contains.key = key
-            contains.value = value
+        node = linked_hash.contains(key)
+        if node is not None:
+            node.key = key
+            node.value = value
         else:
             linked_hash.insert(key, value)
             self._size += 1
-
 
     def empty_buckets(self) -> int:
         """ A method that returns the number of empty buckets in the hash table.
@@ -82,48 +83,90 @@ class HashMap:
     def table_load(self) -> float:
         """ A method that returns the current hash table load factor.
         """
-        hash_table = self._buckets
         table_load = self._size / self._capacity
         return table_load
 
-
-
-
     def clear(self) -> None:
+        """ A method that clears the contents of the hash map.
         """
-        TODO: Write this implementation
-        """
-        pass
+        hash_table = self._buckets
+        link = LinkedList()
+        for index in range(0, hash_table.length()):
+            if hash_table.get_at_index(index).length() != 0:
+                hash_table.set_at_index(index, link)
+        capacity = self.get_capacity()
+        self._size = 0
 
     def resize_table(self, new_capacity: int) -> None:
+        """ A method that changes the capacity of the internal hash table.
         """
-        TODO: Write this implementation
-        """
-        pass
+
 
     def get(self, key: str) -> object:
+        """ A method that returns the value associated with a given key.
         """
-        TODO: Write this implementation
-        """
-        pass
+        buckets = self._buckets
+        hash = self._hash_function(key)
+        index = hash % buckets.length()
+        if buckets.get_at_index(index).length() == 0:
+            return None
+        else:
+            link = buckets.get_at_index(index)
+            node = link.contains(key)
+            if node is None:
+                return None
+            return node.value
+
 
     def contains_key(self, key: str) -> bool:
+        """ A method that returns True if the given key is found in the hash map.
         """
-        TODO: Write this implementation
-        """
-        pass
+
+        buckets = self._buckets
+        hash = self._hash_function(key)
+        index = hash % buckets.length()
+        if buckets.length() == 0:
+            return False
+        if buckets.get_at_index(index).length() == 0:
+            return False
+        else:
+            link = buckets.get_at_index(index)
+            node = link.contains(key)
+            if node is None:
+                return False
+            return True
 
     def remove(self, key: str) -> None:
+        """ A method that removes a given key and it's value from the hash map.
         """
-        TODO: Write this implementation
-        """
-        pass
+        buckets = self._buckets
+        hash = self._hash_function(key)
+        index = hash % buckets.length()
+
+        link = buckets.get_at_index(index)
+        node = link.contains(key)
+        if node is None:
+            return
+        else:
+            link.remove(key)
 
     def get_keys(self) -> DynamicArray:
+        """ A method that returns a DynamicArray of all the keys in the hash.
         """
-        TODO: Write this implementation
-        """
-        pass
+        hash_table = self._buckets
+        array = DynamicArray()
+        hash_table.
+        for index in range(0, hash_table.length()):
+            if hash_table.get_at_index(index).length() > 1:
+                node = hash_table.get_at_index(index)
+
+                while node.next is not None:
+                    array.append(node)
+                    node = node.next
+
+            elif hash_table.get_at_index(index).length() == 1:
+                node = hash_table.get_at_index(index)
+                array.append(node)
 
 
 def find_mode(da: DynamicArray) -> (DynamicArray, int):
