@@ -61,15 +61,37 @@ class HashMap:
         buckets = self._buckets
         hash = self._hash_function(key)
         index = hash % buckets.length()
+        size = self._size
+        table_load = self.table_load()
         entry = buckets.get_at_index(index)
+
+
         if self.table_load() >= 0.5:
             self.resize_table(self._capacity * 2)
 
-        if entry is not None:
+        if index >= buckets.length() - 1:
+            index = index % buckets.length()
+
+        if entry is None:
+            buckets.set_at_index(index, HashEntry(key, value))
+            self._size += 1
+        else:
             if entry.is_tombstone is True:
-
-
-
+                buckets.set_at_index(index, HashEntry(key, value))
+                #self._size += 1
+            else:
+                if entry.key == key:
+                    buckets.set_at_index(index, HashEntry(key, value))
+                else:
+                    jump = 1
+                    while entry is not None:
+                        index += (jump**2)
+                        if index >= buckets.length() - 1:
+                            index = index % buckets.length()
+                        jump += 1
+                        entry = buckets.get_at_index(index)
+                    buckets.set_at_index(index, HashEntry(key, value))
+                    self._size += 1
 
     def table_load(self) -> float:
         """ A method that returns the current hash table load factor.
@@ -82,32 +104,132 @@ class HashMap:
         """
         buckets = self._buckets
         count = 0
-        for index in range(0, self._size):
+        for index in range(0, buckets.length()):
             value = buckets.get_at_index(index)
-            inside_value = 1 + 1
-            #if buckets.get_at_index(index) is None:
-                #count += 1
+            if buckets.get_at_index(index) is None:
+                count += 1
+            elif value.is_tombstone is True:
+                count += 1
+        return count
 
     def resize_table(self, new_capacity: int) -> None:
         """ A method that changes the capacity of the internal hash table.
-        """
         # remember to rehash non-deleted entries into new table
-        pass
+        """
+        if new_capacity < 1 or new_capacity < self._size:
+            return
+
+        buckets = self._buckets
+        new_table = DynamicArray()
+
+        for index in range(0, new_capacity):
+            new_table.append(None)
+        self._buckets = new_table
+        self._capacity = new_capacity
+        self._size = 0
+
+        for index in range(0, buckets.length()):
+            bucket = buckets.get_at_index(index)
+            if bucket is not None:
+                if bucket.is_tombstone is False:
+                    value = bucket.value
+                    key = bucket.key
+                    self.put(key, value)
+        test = self._size
 
     def get(self, key: str) -> object:
         """ A method that returns the value associated with the given key.
         """
-        pass
+        buckets = self._buckets
+        hash = self._hash_function(key)
+        index = hash % buckets.length()
+        entry = buckets.get_at_index(index)
+
+        if entry is None:
+            return False
+        else:
+            if entry.is_tombstone is True:
+                return None
+            else:
+                if entry.key == key:
+                    return entry.value
+                else:
+                    jump = 1
+                    while entry is not None:
+                        index += jump ** 2
+                        if index >= buckets.length():
+                            index = index % buckets.length()
+                        jump += 1
+                        entry = buckets.get_at_index(index)
+                        if entry is None:
+                            return None
+                        if entry.key == key:
+                            return entry.value
+        return None
 
     def contains_key(self, key: str) -> bool:
         """A method that searches for a given key in the hash map.
         """
-        pass
+        buckets = self._buckets
+        hash = self._hash_function(key)
+        index = hash % buckets.length()
+        entry = buckets.get_at_index(index)
+
+        if entry is None:
+            return False
+        else:
+            if entry.is_tombstone is True:
+                return False
+            else:
+                if entry.key == key:
+                    return True
+                else:
+                    jump = 1
+                    while entry is not None:
+                        index += jump ** 2
+                        if index >= buckets.length():
+                            index = index % buckets.length()
+                        jump += 1
+                        entry = buckets.get_at_index(index)
+                        if entry is None:
+                            return False
+                        if entry.key == key:
+                            return True
+        return False
 
     def remove(self, key: str) -> None:
         """ The method removes the given key and it's value from the hash map.
         """
-        pass
+        buckets = self._buckets
+        hash = self._hash_function(key)
+        index = hash % buckets.length()
+        entry = buckets.get_at_index(index)
+
+        if entry is None:
+            return
+        else:
+            if entry.is_tombstone is True:
+                return
+            else:
+                if entry.key == key:
+                    entry.is_tombstone = True
+                    self._size -= 1
+                    return
+                else:
+                    jump = 1
+                    while entry is not None:
+                        index += jump ** 2
+                        if index >= buckets.length():
+                            index = index % buckets.length()
+                        jump += 1
+                        entry = buckets.get_at_index(index)
+                        if entry is None:
+                            return
+                        if entry.key == key:
+                            entry.is_tombstone = True
+                            self._size -= 1
+                            return
+        return
 
     def clear(self) -> None:
         """ A method that clears the contents of the hash map.
