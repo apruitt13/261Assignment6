@@ -65,7 +65,10 @@ class HashMap:
         if self.table_load() >= 0.5:
             self.resize_table(self._capacity * 2)
 
-        if entry
+        if entry is not None:
+            if entry.is_tombstone is True:
+
+
 
 
     def table_load(self) -> float:

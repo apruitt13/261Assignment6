@@ -214,6 +214,8 @@ def find_mode(da: DynamicArray) -> (DynamicArray, int):
                 mode_array.append(da.get_at_index(index))
             elif count > stored_count:
                 mode_array = DynamicArray()
+
+
                 mode_array.append(da.get_at_index(index))
                 stored_count = count
         else:
