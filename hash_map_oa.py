@@ -56,6 +56,10 @@ class HashMap:
     def put(self, key: str, value: object) -> None:
         """ A method that updates the key/value pair in the hash map.
         """
+        if self.table_load() >= 0.5:
+            self.resize_table(self._capacity * 2)
+            buckets = self._buckets
+
         buckets = self._buckets
         hash = self._hash_function(key)
         index = hash % self._capacity
@@ -63,10 +67,9 @@ class HashMap:
         success = None
         jump = 1
 
-        if self.table_load() >= 0.5:
-            self.resize_table(self._capacity * 2)
-            buckets = self._buckets
         while success is not True:
+
+
             if entry is None:
                 buckets.set_at_index(index, HashEntry(key, value))
                 self._size += 1
