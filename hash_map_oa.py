@@ -58,7 +58,7 @@ class HashMap:
         """
         buckets = self._buckets
         hash = self._hash_function(key)
-        index = hash % buckets.length()
+        index = hash % self._capacity
         entry = buckets.get_at_index(index)
         success = None
         jump = 1
@@ -66,7 +66,6 @@ class HashMap:
         if self.table_load() >= 0.5:
             self.resize_table(self._capacity * 2)
             buckets = self._buckets
-
         while success is not True:
             if entry is None:
                 buckets.set_at_index(index, HashEntry(key, value))
@@ -82,10 +81,10 @@ class HashMap:
                 entry.is_tombstone = False
                 success = True
             else:
-                index = hash % buckets.length()
+                index = hash % self._capacity
                 index += (jump ** 2)
                 if index > buckets.length() - 1:
-                    index = index % buckets.length()
+                    index = index % self._capacity
                 jump += 1
                 entry = buckets.get_at_index(index)
 
@@ -152,10 +151,10 @@ class HashMap:
             elif entry.key == key:
                 return entry.value
             else:
-                index = hash % buckets.length()
+                index = hash % self._capacity
                 index += (jump ** 2)
                 if index > buckets.length() - 1:
-                    index = index % buckets.length()
+                    index = index % self._capacity
                 jump += 1
                 entry = buckets.get_at_index(index)
 
@@ -180,10 +179,10 @@ class HashMap:
             elif entry.key == key:
                 return True
             else:
-                index = hash % buckets.length()
+                index = hash % self._capacity
                 index += (jump ** 2)
                 if index > buckets.length() - 1:
-                    index = index % buckets.length()
+                    index = index % self._capacity
                 jump += 1
                 entry = buckets.get_at_index(index)
 
@@ -200,6 +199,8 @@ class HashMap:
         while success is not True:
             if entry is None:
                 return
+            if self.contains_key(key) is False:
+                return
             if entry.key == key and entry.is_tombstone is True:
                 return
             if entry.key == key and entry.is_tombstone is False:
@@ -207,10 +208,10 @@ class HashMap:
                 self._size -= 1
                 success = True
             else:
-                index = hash % buckets.length()
+                index = hash % self._capacity
                 index += (jump ** 2)
                 if index > buckets.length() - 1:
-                    index = index % buckets.length()
+                    index = index % self._capacity
                 jump += 1
                 entry = buckets.get_at_index(index)
 
@@ -247,14 +248,18 @@ if __name__ == "__main__":
     m.put("key615", -869)
     m.put('key10', 10)
     m.put('key10', 12)
-    m.put('key10', 13)
-    m.put('key10', 14)
     m.put('key01', 10)
-
+    m.put('key10', 13)
+    m.put('key01', 13)
+    m.put('key10', 14)
+    m.put('key01', 14)
     m.contains_key('key01')
     m.remove('key01')
     m.remove('key10')
     m.put('key10', 13)
+    m.put('key01', 13)
+    m.put('key10', 14)
+    m.put('key01', 14)
     m.contains_key('key01')
     print(m._size)
 
