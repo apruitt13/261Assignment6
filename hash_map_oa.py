@@ -56,42 +56,38 @@ class HashMap:
     def put(self, key: str, value: object) -> None:
         """ A method that updates the key/value pair in the hash map.
         """
-        # remember, if the load factor is greater than or equal to 0.5,
-        # resize the table before putting the new key/value pair
         buckets = self._buckets
         hash = self._hash_function(key)
         index = hash % buckets.length()
-        size = self._size
-        table_load = self.table_load()
         entry = buckets.get_at_index(index)
-
+        success = None
+        jump = 1
 
         if self.table_load() >= 0.5:
             self.resize_table(self._capacity * 2)
+            buckets = self._buckets
 
-        if index >= buckets.length() - 1:
-            index = index % buckets.length()
-
-        if entry is None:
-            buckets.set_at_index(index, HashEntry(key, value))
-            self._size += 1
-        else:
-            if entry.is_tombstone is True:
+        while success is not True:
+            if entry is None:
                 buckets.set_at_index(index, HashEntry(key, value))
-                #self._size += 1
+                self._size += 1
+                success = True
+            elif entry.is_tombstone is True and entry.key == key:
+                entry.value = value
+                entry.is_tombstone = False
+                self._size += 1
+                success = True
+            elif entry.key == key:
+                entry.value = value
+                entry.is_tombstone = False
+                success = True
             else:
-                if entry.key == key:
-                    buckets.set_at_index(index, HashEntry(key, value))
-                else:
-                    jump = 1
-                    while entry is not None:
-                        index += (jump**2)
-                        if index >= buckets.length() - 1:
-                            index = index % buckets.length()
-                        jump += 1
-                        entry = buckets.get_at_index(index)
-                    buckets.set_at_index(index, HashEntry(key, value))
-                    self._size += 1
+                index = hash % buckets.length()
+                index += (jump ** 2)
+                if index > buckets.length() - 1:
+                    index = index % buckets.length()
+                jump += 1
+                entry = buckets.get_at_index(index)
 
     def table_load(self) -> float:
         """ A method that returns the current hash table load factor.
@@ -106,10 +102,12 @@ class HashMap:
         count = 0
         for index in range(0, buckets.length()):
             value = buckets.get_at_index(index)
-            if buckets.get_at_index(index) is None:
+            if value is not None:
+                if value.is_tombstone is True:
+                    count += 1
+            else:
                 count += 1
-            elif value.is_tombstone is True:
-                count += 1
+
         return count
 
     def resize_table(self, new_capacity: int) -> None:
@@ -135,7 +133,6 @@ class HashMap:
                     value = bucket.value
                     key = bucket.key
                     self.put(key, value)
-        test = self._size
 
     def get(self, key: str) -> object:
         """ A method that returns the value associated with the given key.
@@ -144,28 +141,23 @@ class HashMap:
         hash = self._hash_function(key)
         index = hash % buckets.length()
         entry = buckets.get_at_index(index)
+        success = None
+        jump = 1
 
-        if entry is None:
-            return False
-        else:
-            if entry.is_tombstone is True:
-                return None
+        while success is not True:
+            if entry is None:
+                return
+            elif entry.is_tombstone is True:
+                return
+            elif entry.key == key:
+                return entry.value
             else:
-                if entry.key == key:
-                    return entry.value
-                else:
-                    jump = 1
-                    while entry is not None:
-                        index += jump ** 2
-                        if index >= buckets.length():
-                            index = index % buckets.length()
-                        jump += 1
-                        entry = buckets.get_at_index(index)
-                        if entry is None:
-                            return None
-                        if entry.key == key:
-                            return entry.value
-        return None
+                index = hash % buckets.length()
+                index += (jump ** 2)
+                if index > buckets.length() - 1:
+                    index = index % buckets.length()
+                jump += 1
+                entry = buckets.get_at_index(index)
 
     def contains_key(self, key: str) -> bool:
         """A method that searches for a given key in the hash map.
@@ -174,28 +166,26 @@ class HashMap:
         hash = self._hash_function(key)
         index = hash % buckets.length()
         entry = buckets.get_at_index(index)
+        success = None
+        jump = 1
 
-        if entry is None:
+        if self._size == 0:
             return False
-        else:
-            if entry.is_tombstone is True:
+
+        while success is not True:
+            if entry is None:
                 return False
+            elif entry.is_tombstone is True and entry.key == key:
+                return False
+            elif entry.key == key:
+                return True
             else:
-                if entry.key == key:
-                    return True
-                else:
-                    jump = 1
-                    while entry is not None:
-                        index += jump ** 2
-                        if index >= buckets.length():
-                            index = index % buckets.length()
-                        jump += 1
-                        entry = buckets.get_at_index(index)
-                        if entry is None:
-                            return False
-                        if entry.key == key:
-                            return True
-        return False
+                index = hash % buckets.length()
+                index += (jump ** 2)
+                if index > buckets.length() - 1:
+                    index = index % buckets.length()
+                jump += 1
+                entry = buckets.get_at_index(index)
 
     def remove(self, key: str) -> None:
         """ The method removes the given key and it's value from the hash map.
@@ -204,47 +194,77 @@ class HashMap:
         hash = self._hash_function(key)
         index = hash % buckets.length()
         entry = buckets.get_at_index(index)
+        success = None
+        jump = 1
 
-        if entry is None:
-            return
-        else:
-            if entry.is_tombstone is True:
+        while success is not True:
+            if entry is None:
                 return
+            if entry.key == key and entry.is_tombstone is True:
+                return
+            if entry.key == key and entry.is_tombstone is False:
+                entry.is_tombstone = True
+                self._size -= 1
+                success = True
             else:
-                if entry.key == key:
-                    entry.is_tombstone = True
-                    self._size -= 1
-                    return
-                else:
-                    jump = 1
-                    while entry is not None:
-                        index += jump ** 2
-                        if index >= buckets.length():
-                            index = index % buckets.length()
-                        jump += 1
-                        entry = buckets.get_at_index(index)
-                        if entry is None:
-                            return
-                        if entry.key == key:
-                            entry.is_tombstone = True
-                            self._size -= 1
-                            return
-        return
+                index = hash % buckets.length()
+                index += (jump ** 2)
+                if index > buckets.length() - 1:
+                    index = index % buckets.length()
+                jump += 1
+                entry = buckets.get_at_index(index)
 
     def clear(self) -> None:
         """ A method that clears the contents of the hash map.
         """
-        pass
+        buckets = self._buckets
+        for index in range(0, buckets.length()):
+            buckets.set_at_index(index, None)
+        self._size = 0
 
     def get_keys(self) -> DynamicArray:
         """ A method that returns a DynamicArray that contains all the keys stored in the hash map.
         """
-        pass
-
+        buckets = self._buckets
+        keys = DynamicArray()
+        for index in range(0, buckets.length()):
+            bucket = buckets.get_at_index(index)
+            if bucket is not None:
+                if bucket.is_tombstone is False:
+                    key = bucket.key
+                    keys.append(key)
+        return keys
 
 # ------------------- BASIC TESTING ---------------------------------------- #
 
 if __name__ == "__main__":
+
+    m = HashMap(102, hash_function_1)
+    print(m._size)
+    m.put("key615", -237)
+    m.remove('key615')
+    m.put("key615", -237)
+    m.put("key615", -869)
+    m.put('key10', 10)
+    m.put('key10', 12)
+    m.put('key10', 13)
+    m.put('key10', 14)
+    m.put('key01', 10)
+
+    m.contains_key('key01')
+    m.remove('key01')
+    m.remove('key10')
+    m.put('key10', 13)
+    m.contains_key('key01')
+    print(m._size)
+
+
+    print(m._size)
+    m.put('key10', 5)
+    print(m._size)
+    m.remove('key10')
+    m.put('key01', 12)
+    print(m._size)
 
     print("\nPDF - put example 1")
     print("-------------------")

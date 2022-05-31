@@ -68,18 +68,6 @@ class HashMap:
             linked_hash.insert(key, value)
             self._size += 1
 
-    def alt_put(self, key: str, value: object) -> None:
-        """ A method that updates the key/value pair in the hash map. If it exists it is replaced with a new value.
-        If it's not in the map than it should be added.
-        """
-        buckets = self._buckets
-        hash = self._hash_function(key)
-        index = hash % buckets.length()
-        linked_hash = buckets.get_at_index(index)
-        node = linked_hash.contains(key)
-        linked_hash.insert(key, value)
-        self._size += 1
-
     def empty_buckets(self) -> int:
         """ A method that returns the number of empty buckets in the hash table.
         """
