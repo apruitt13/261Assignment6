@@ -69,7 +69,6 @@ class HashMap:
 
         while success is not True:
 
-
             if entry is None:
                 buckets.set_at_index(index, HashEntry(key, value))
                 self._size += 1
