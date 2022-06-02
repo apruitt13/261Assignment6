@@ -60,10 +60,14 @@ class HashMap:
         hash = self._hash_function(key)
         index = hash % buckets.length()
         linked_hash = buckets.get_at_index(index)
-        node = linked_hash.contains(key)
+        node = linked_hash.contains(key)                # Searches if the key is found at that index.
+
+        # If contains comes back as True the key and value are changed.
         if node is not None:
             node.key = key
             node.value = value
+
+        # Otherwise, a new node is inserted.
         else:
             linked_hash.insert(key, value)
             self._size += 1
@@ -71,15 +75,19 @@ class HashMap:
     def empty_buckets(self) -> int:
         """ A method that returns the number of empty buckets in the hash table.
         """
-        hash_table = self._buckets
+        buckets = self._buckets
         empty_buckets = 0
-        for index in range(0, hash_table.length()):
-            if hash_table.get_at_index(index).length() == 0:
+
+        # Looping through the whole array. If a bucket is empty 1 is added to the count.
+        for index in range(0, buckets.length()):
+            if buckets.get_at_index(index).length() == 0:
                 empty_buckets += 1
+
         return empty_buckets
 
     def table_load(self) -> float:
-        """ A method that returns the current hash table load factor.
+        """ A method that returns the current hash table load factor. It is calculated by the size divided by
+        the capacity.
         """
         table_load = self._size / self._capacity
         return table_load
@@ -87,25 +95,32 @@ class HashMap:
     def clear(self) -> None:
         """ A method that clears the contents of the hash map.
         """
-        hash_table = self._buckets
-        link = LinkedList()
-        for index in range(0, hash_table.length()):
-            if hash_table.get_at_index(index).length() != 0:
-                hash_table.set_at_index(index, link)
+        buckets = self._buckets
+        new_list = LinkedList()
+
+        # Loops through all the buckets. If a bucket has nodes with values, it is replaced with an empty linked list.
+        for index in range(0, buckets.length()):
+            if buckets.get_at_index(index).length() != 0:
+                buckets.set_at_index(index, new_list)
         capacity = self.get_capacity()
-        self._size = 0
+        self._size = 0                                      # Resets the size to zero.
 
     def resize_table(self, new_capacity: int) -> None:
         """ A method that changes the capacity of the internal hash table.
         """
         buckets = self._buckets
         new_hash = DynamicArray()
+
+        # If the new_capacity is less than one nothing happens.
         if new_capacity < 1:
             return
+
+        # Creates a new linked list based on the new_capacity.
         for index in range(0, new_capacity):
             link = LinkedList()
             new_hash.append(link)
 
+        # Adds only the nodes that have keys and values to the new array.
         for index in range(0, buckets.length()):
             count = buckets.get_at_index(index).length()
             bucket = buckets.get_at_index(index)
@@ -119,6 +134,7 @@ class HashMap:
                     linked_hash.insert(key, value)
                     count -= 1
 
+        # Replaces the old hash with the new one.
         self._buckets = new_hash
         self._capacity = new_capacity
 
@@ -128,8 +144,12 @@ class HashMap:
         buckets = self._buckets
         hash = self._hash_function(key)
         index = hash % buckets.length()
+
+        # If the bucket has nothing in it return None.
         if buckets.get_at_index(index).length() == 0:
             return None
+
+        # Otherwise, check to see if that bucket contains the key. If it does return the value.
         else:
             link = buckets.get_at_index(index)
             node = link.contains(key)
@@ -137,18 +157,19 @@ class HashMap:
                 return None
             return node.value
 
-
     def contains_key(self, key: str) -> bool:
         """ A method that returns True if the given key is found in the hash map.
         """
-
         buckets = self._buckets
         hash = self._hash_function(key)
         index = hash % buckets.length()
+
         if buckets.length() == 0:
             return False
         if buckets.get_at_index(index).length() == 0:
             return False
+
+        # If there is something in the bucket then check to see if the key is in there. If it is then return the value.
         else:
             link = buckets.get_at_index(index)
             node = link.contains(key)
@@ -162,11 +183,13 @@ class HashMap:
         buckets = self._buckets
         hash = self._hash_function(key)
         index = hash % buckets.length()
-
         link = buckets.get_at_index(index)
         node = link.contains(key)
+
+        # If the key is not in that bucket return None.
         if node is None:
             return
+        # Otherwise, remove th key and decrease the size.
         else:
             link.remove(key)
             self._size -= 1
@@ -177,6 +200,8 @@ class HashMap:
         hash_table = self._buckets
         array = DynamicArray()
 
+        # Looping through the whole array. If the bucket isn't empty then loop through the bucket adding each key
+        # in the bucket.
         for index in range(0, hash_table.length()):
             if hash_table.get_at_index(index).length() > 0:
                 bucket = hash_table.get_at_index(index)
@@ -194,7 +219,11 @@ def find_mode(da: DynamicArray) -> (DynamicArray, int):
     stored_count = 0
     mode_array = DynamicArray()
 
+    # Looping through all of the indices.
     for index in range(0, da.length()):
+
+        # If the map doesn't contain the key it adds the key to that index, and it's value is one. If the count is the
+        # same as the stored count add it to the array. If it's greater empty the current node_array add the key/value.
         if map.contains_key(da.get_at_index(index)) is False:
             count = 1
             map.put(da.get_at_index(index), count)
@@ -202,10 +231,11 @@ def find_mode(da: DynamicArray) -> (DynamicArray, int):
                 mode_array.append(da.get_at_index(index))
             elif count > stored_count:
                 mode_array = DynamicArray()
-
-
                 mode_array.append(da.get_at_index(index))
                 stored_count = count
+
+        # Otherwise, update the key's value by adding one to it. Then if it's equal to the current count add it to the
+        # array. If it's greater than the current count empty the current node_array and add the key and value.
         else:
             count = map.get(da.get_at_index(index))
             map.put(da.get_at_index(index), count + 1)

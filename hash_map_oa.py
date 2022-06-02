@@ -54,11 +54,11 @@ class HashMap:
     # ------------------------------------------------------------------ #
 
     def put(self, key: str, value: object) -> None:
-        """ A method that updates the key/value pair in the hash map.
+        """ A method that updates the key/value pair in the hash map or adds a new key/value pair.
         """
+        # Checking the table load had to be first!
         if self.table_load() >= 0.5:
             self.resize_table(self._capacity * 2)
-            buckets = self._buckets
 
         buckets = self._buckets
         hash = self._hash_function(key)
@@ -67,21 +67,24 @@ class HashMap:
         success = None
         jump = 1
 
+        # The while loop will only end if success is True.
         while success is not True:
-
-            if entry is None:
+            if entry is None:                                       # If nothing at the index add the key/value.
                 buckets.set_at_index(index, HashEntry(key, value))
                 self._size += 1
                 success = True
-            elif entry.is_tombstone is True and entry.key == key:
+            elif entry.is_tombstone is True and entry.key == key:   # If the item had been deleted update it.
                 entry.value = value
                 entry.is_tombstone = False
                 self._size += 1
                 success = True
-            elif entry.key == key:
+            elif entry.key == key:                                  # If the item matches the key update the value.
                 entry.value = value
                 entry.is_tombstone = False
                 success = True
+
+            # If that index is full use quadratic probing to find the next available spot. Looping through again
+            # checking the above conditions. If it reaches the end of the array it wraps around.
             else:
                 index = hash % self._capacity
                 index += (jump ** 2)
@@ -91,7 +94,7 @@ class HashMap:
                 entry = buckets.get_at_index(index)
 
     def table_load(self) -> float:
-        """ A method that returns the current hash table load factor.
+        """ A method that returns the current hash table load factor. It is found bye dividing the size and capacity.
         """
         table_load = self._size / self._capacity
         return table_load
@@ -101,6 +104,8 @@ class HashMap:
         """
         buckets = self._buckets
         count = 0
+
+        # Loops through all of the buckets and if they are empty adds one to the count. Takes into account TS.
         for index in range(0, buckets.length()):
             value = buckets.get_at_index(index)
             if value is not None:
@@ -115,18 +120,21 @@ class HashMap:
         """ A method that changes the capacity of the internal hash table.
         # remember to rehash non-deleted entries into new table
         """
+        # If the new capacity is smaller than one or the current size.
         if new_capacity < 1 or new_capacity < self._size:
             return
 
         buckets = self._buckets
         new_table = DynamicArray()
 
+        # Creates a new empty hash map and saves the old map and replaces it.
         for index in range(0, new_capacity):
             new_table.append(None)
         self._buckets = new_table
         self._capacity = new_capacity
         self._size = 0
 
+        # Loops through the old hash map adding all the buckets that aren't empty to the new hashmap.
         for index in range(0, buckets.length()):
             bucket = buckets.get_at_index(index)
             if bucket is not None:
@@ -145,6 +153,8 @@ class HashMap:
         success = None
         jump = 1
 
+        # Loops through until a value is found or an entry is None or TS is True. Uses quadratic probing if an index is
+        # full. Will loop to the front if the end of the array is reached.
         while success is not True:
             if entry is None:
                 return
@@ -173,6 +183,8 @@ class HashMap:
         if self._size == 0:
             return False
 
+        # Loops through until a value is found or an entry is None or TS is True. Uses quadratic probing if an index is
+        # full. Will loop to the front if the end of the array is reached.
         while success is not True:
             if entry is None:
                 return False
@@ -198,6 +210,8 @@ class HashMap:
         success = None
         jump = 1
 
+        # Loops through until a value is found or an entry is None or TS is true. Uses quadratic probing if an index is
+        # full. Will loop to the front if the end of the array is reached. If it's found TS is set to True.
         while success is not True:
             if entry is None:
                 return
@@ -221,7 +235,7 @@ class HashMap:
         """ A method that clears the contents of the hash map.
         """
         buckets = self._buckets
-        for index in range(0, buckets.length()):
+        for index in range(0, buckets.length()):        # Loops through setting all buckets to None.
             buckets.set_at_index(index, None)
         self._size = 0
 
@@ -230,6 +244,8 @@ class HashMap:
         """
         buckets = self._buckets
         keys = DynamicArray()
+
+        # Loops through and if the index has a value and TS isn't false the key is added to the array.
         for index in range(0, buckets.length()):
             bucket = buckets.get_at_index(index)
             if bucket is not None:
