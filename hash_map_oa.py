@@ -3,7 +3,7 @@
 # Course: CS261 - Data Structures
 # Assignment: 6
 # Due Date: 6/3/22
-# Description:A HashMap that uses open addressing with quadratic probing for collision resolution.
+# Description: A HashMap that uses open addressing with quadratic probing for collision resolution.
 
 
 from a6_include import (DynamicArray, HashEntry,
@@ -257,37 +257,6 @@ class HashMap:
 # ------------------- BASIC TESTING ---------------------------------------- #
 
 if __name__ == "__main__":
-
-    m = HashMap(102, hash_function_1)
-    print(m._size)
-    m.put("key615", -237)
-    m.remove('key615')
-    m.put("key615", -237)
-    m.put("key615", -869)
-    m.put('key10', 10)
-    m.put('key10', 12)
-    m.put('key01', 10)
-    m.put('key10', 13)
-    m.put('key01', 13)
-    m.put('key10', 14)
-    m.put('key01', 14)
-    m.contains_key('key01')
-    m.remove('key01')
-    m.remove('key10')
-    m.put('key10', 13)
-    m.put('key01', 13)
-    m.put('key10', 14)
-    m.put('key01', 14)
-    m.contains_key('key01')
-    print(m._size)
-
-
-    print(m._size)
-    m.put('key10', 5)
-    print(m._size)
-    m.remove('key10')
-    m.put('key01', 12)
-    print(m._size)
 
     print("\nPDF - put example 1")
     print("-------------------")

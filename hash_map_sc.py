@@ -329,7 +329,6 @@ if __name__ == "__main__":
     print(m.get_size(), m.get_capacity())
     m.put('key2', 20)
     print(m.get_size(), m.get_capacity())
-
     m.resize_table(100)
     print(m.get_size(), m.get_capacity())
     m.clear()
@@ -355,7 +354,6 @@ if __name__ == "__main__":
         m.resize_table(capacity)
 
         m.put('some key', 'some value')
-        size = m.get_size()
         result = m.contains_key('some key')
         m.remove('some key')
 
@@ -364,7 +362,6 @@ if __name__ == "__main__":
             result &= m.contains_key(str(key))
             # NOT inserted keys must be absent
             result &= not m.contains_key(str(key + 1))
-            size = m.get_size()
         print(capacity, result, m.get_size(), m.get_capacity(), round(m.table_load(), 2))
 
     print("\nPDF - get example 1")
